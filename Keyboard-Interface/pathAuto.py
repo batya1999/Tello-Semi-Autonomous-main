@@ -1,5 +1,4 @@
 from numpy import imag
-from Aruco_detection import ArucoDetection
 from Tello_video import FileVideoStreamTello
 from socket import *
 from djitellopy import tello

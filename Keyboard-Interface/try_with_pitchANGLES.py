@@ -131,8 +131,8 @@ class MinimalSubscriber:
 
                 # self.me.send_rc_control(0, 0, 0, int(yaw_30_degrees))  # Yaw right 30 degrees
                 self.me.rotate_clockwise(180)
-                self.command = "YAW RIGHT 60 degrees"
-                time.sleep(60)
+                # self.command = "YAW RIGHT 60 degrees"
+                time.sleep(6)
 
                 # self.me.send_rc_control(0, 0, 0, int(yaw_30_degrees))  # Yaw right 30 degrees
                 # self.command = "YAW LEFT 60 degrees"

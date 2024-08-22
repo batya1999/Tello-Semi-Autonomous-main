@@ -1,5 +1,4 @@
 from numpy import imag
-from Aruco_detection import ArucoDetection
 from Tello_video import FileVideoStreamTello
 from socket import *
 from djitellopy import tello
@@ -9,6 +8,7 @@ from math import atan2, cos, sin, sqrt, pi
 import numpy as np
 import keyboard
 from logger import Logger                  
+import time
 
 class MinimalSubscriber():
 
@@ -62,7 +62,6 @@ class MinimalSubscriber():
             raise RuntimeError("Tello rejected attemp to takeoff due to low Battery")
 
         # Aruco detector
-        self.aruco = ArucoDetection(self.ARUCO_DICT)
         # stream thread
         self.streamQ = FileVideoStreamTello(self.me)
         self.draw_thread = Thread(target=self.draw)
@@ -98,6 +97,7 @@ class MinimalSubscriber():
             a, b, c, d = 0, 0, 0, 0
             self.command = "stand"
 
+
             # Takeoff 
             if keyboard.is_pressed('space') and not tookoff:
                 tookoff = True
@@ -131,10 +131,10 @@ class MinimalSubscriber():
             
             # Left / Right
             elif keyboard.is_pressed('left'):
-                d = -0.5 * big_factor
+                a = -0.5 * big_factor
                 self.command = "LEFT"
-            elif keyboard.is_pressed('right'):
-                d = 0.5 * big_factor
+            elif keyboard.is_pressed('right'):  
+                a = 0.5 * big_factor
                 self.command = "RIGHT"
             
             # Forward / Backward
@@ -145,13 +145,30 @@ class MinimalSubscriber():
                 b = -0.5 * big_factor
                 self.command = "BACKWARD"
             
-            # YAW
+            # YAW 
             elif keyboard.is_pressed('a'):
-                a = -0.5 * big_factor
+                d = -0.1 * big_factor
                 self.command = "YAW LEFT"
             elif keyboard.is_pressed('d'):
-                a = 0.5 * big_factor
+                d = 0.1 * big_factor
                 self.command = "YAW RIGHT"
+            elif keyboard.is_pressed('g'):
+                # Execute the automated path
+                if not tookoff:
+                    self.me.takeoff()
+                    tookoff = True
+                    self.command = "takeoff"
+                time.sleep(0.5)
+
+                # self.me.send_rc_control(0, 0, 0, int(yaw_30_degrees))  # Yaw right 30 degrees
+                self.me.rotate_clockwise(15)
+                # self.command = "YAW RIGHT 60 degrees"
+                time.sleep(2)
+                self.me.rotate_clockwise(-15)
+                time.sleep(2)
+                print(self.me.get_height())
+                self.me.land() 
+                
             
             # Save log
             elif keyboard.is_pressed('m'):
@@ -159,7 +176,9 @@ class MinimalSubscriber():
                 print("Log saved successfully!")
             
             # send the commands to the drone
-            self.me.send_rc_control(int(a), int(b), int(c), int(d))
+            print("height in cm is:", self.me.get_height())
+            print("Baro value is:", self.me.get_barometer())
+            self.me.send_rc_control(int(a), int(b), int(c), int(d)) # 
 
 
     def log_update(self):
