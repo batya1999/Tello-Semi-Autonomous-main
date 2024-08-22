@@ -35,7 +35,7 @@ class MinimalSubscriber:
         """
         Allows the user to control the drone using the keyboard.
         'space' - takeoff / land   
-        'b' - battery status
+        'b' - battery status ddwa 
         'e' - emergency
         'up' - Up
         'down' - Down
